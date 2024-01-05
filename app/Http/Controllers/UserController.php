@@ -134,4 +134,19 @@ class UserController extends Controller
              return response()->json(['status' => 'fail','message'=>'Wrong Id' ],401);
         }
     }
+    public function deleteUser(Request $request){
+        $id=$request->input("id");
+        $users=User::all()->pluck("id");
+        $valid_users=array();
+        foreach($users as $u){
+            array_push($valid_users,$u);
+        }
+        if(empty($id) || !in_array($id, $valid_users)){
+              return response()->json(['status' => 'fail','message'=>'Invalid User id' ],401);
+        }
+        else{
+            User::where("id",$id)->delete();
+             return response()->json(['status' => 'success' ],200);
+        }    
+    }
 }

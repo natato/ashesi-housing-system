@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Auth;
 use App\Hostel;
+use App\Room;
 class HostelController extends Controller
 {
     /**
@@ -115,6 +116,27 @@ class HostelController extends Controller
             }
             return response()->json(['status' => 'fail','message'=>'No data' ],401);
         }    
+    }
+    public function deleteHostel(Request $request){
+        $id=$request->input("hostelid");
+        $hostels=Hostel::all()->pluck("hostelId");
+        $valid_hostels=array();
+        foreach($hostels as $h){
+            array_push($valid_hostels,$h);
+        }
+        if(empty($id) || !in_array($id, $valid_hostels)){
+              return response()->json(['status' => 'fail','message'=>'Invalid Hostel id' ],401);
+        }
+        else{
+            $rooms=Room::where("hostelId",$id)->select("hostelId")->first();
+            if($rooms==null){
+                Hostel::where("hostelId",$id)->delete();
+                return response()->json(['status' => 'success' ],200);
+            }
+            else{
+                 return response()->json(['status' => 'fail','message'=>'Can not delete Hostel. Hostel has Rooms.' ],401);  
+            }
+        }
     }
 
 }
